@@ -2,6 +2,13 @@ import sys
 import os
 import numpy as np
 
+def fileinit(path): #기존에 저장되어있던 파일을 삭제 시켜준다. path는 현재 디렉토리
+    saved_file = ['dataset.test.txt', 'dataset.train.txt', 'dataset.valid.txt', 'dataset.train.npy', "dataset.vocab.pkl"]
+
+    for file in saved_file:
+        file_path = path + '/' + file
+        if os.path.exists(file_path):
+            os.remove(file_path)
 
 def preprocess(text):
     text = text.lower()
