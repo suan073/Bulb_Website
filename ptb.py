@@ -12,12 +12,14 @@ url_base = 'https://raw.githubusercontent.com/tomsercu/lstm/master/data/'
 key_file = {
     'train':'dataset.train.txt',
     'test':'dataset.test.txt',
-    'valid':'dataset.valid.txt'
+    'valid':'dataset.valid.txt',
+    'corpus':'dataset.corpus.txt'
 }
 save_file = {
     'train':'dataset.train.npy',
     'test':'dataset.test.npy',
-    'valid':'dataset.valid.npy'
+    'valid':'dataset.valid.npy',
+    'corpus':'dataset.corpus.npy'
 }
 vocab_file = 'dataset.vocab.pkl'
 
@@ -41,7 +43,7 @@ def _download(file_name):
     print('Done')
 
 
-def load_vocab():
+def load_vocab(data_type):
     vocab_path = dataset_dir + '/' + vocab_file
 
     if os.path.exists(vocab_path):
@@ -51,7 +53,7 @@ def load_vocab():
 
     word_to_id = {}
     id_to_word = {}
-    data_type = 'train'
+    #data_type = 'train'
     file_name = key_file[data_type]
     file_path = dataset_dir + '/' + file_name
 
@@ -79,7 +81,7 @@ def load_data(data_type='train'):
     if data_type == 'val': data_type = 'valid'
     save_path = dataset_dir + '/' + save_file[data_type]
 
-    word_to_id, id_to_word = load_vocab()
+    word_to_id, id_to_word = load_vocab(data_type)
 
     if os.path.exists(save_path):
         corpus = np.load(save_path)
