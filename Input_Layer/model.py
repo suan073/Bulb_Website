@@ -9,12 +9,11 @@ class SentenceSimilarityModel(nn.Module):
     def __init__(self, vocab, embedding_dim, hidden_dim):
         super(SentenceSimilarityModel, self).__init__()
         self.embedding = nn.Embedding(len(vocab), embedding_dim)
-        self.batch_norm = nn.BatchNorm1d(embedding_dim, eps=1e-05, momentum=0.1, affine=False, track_running_stats=False)
         self.lstm = nn.LSTM(embedding_dim, hidden_dim, batch_first=True)
-        self.linear = nn.Linear(hidden_dim, len(vocab))
-
+        self.linear = nn.Linear(2*hidden_dim, 1)
+        
         self.optimizer = optim.Adam(self.parameters())
-        self.loss_fn = nn.CrossEntropyLoss()
+        self.loss_fn = nn.BCEWithLogitsLoss()
 
         self.vocab = vocab
         self.vocab_size = len(vocab)
@@ -24,20 +23,28 @@ class SentenceSimilarityModel(nn.Module):
         self.word_to_index = {str(w): i for i, w in enumerate(vocab)}
         self.index_to_word = {i: str(w) for i, w in enumerate(vocab)}
 
-    def forward(self, sentences):
-        embedded_sentences = self.embedding(sentences)
-        embedded_sentences = self.batch_norm(embedded_sentences)
-        lstm_out, _ = self.lstm(embedded_sentences)
-        lstm_out = lstm_out[:, -1, :]
-        out = self.linear(lstm_out)
+    def forward(self, sentences1, sentences2):
+        embedded_sentences1 = self.embedding(sentences1)
+        lstm_out1, _ = self.lstm(embedded_sentences1)
+        lstm_out1 = lstm_out1[:, -1, :]
+        
+        embedded_sentences2 = self.embedding(sentences2)
+        lstm_out2, _ = self.lstm(embedded_sentences2)
+        lstm_out2 = lstm_out2[:, -1, :]
+
+        if lstm_out1.shape != lstm_out2.shape:
+            if lstm_out1.shape[0] < lstm_out2.shape[0]:
+                lstm_out1 = torch.nn.functional.pad(lstm_out1, (0,0,0, lstm_out2.shape[0]-lstm_out1.shape[0]))
+            else:
+                lstm_out2 = torch.nn.functional.pad(lstm_out2, (0,0,0, lstm_out1.shape[0]-lstm_out2.shape[0]))
+        
+        concatenated = torch.cat((lstm_out1, lstm_out2), dim=1)
+        out = self.linear(concatenated)
         return out
 
-    def train(self, sentences, targets, batch_size, epochs):
-        sentences = [torch.LongTensor([self.word_to_index[str(word)] for word in sentence]) for sentence in sentences]
-        targets = [torch.LongTensor([self.word_to_index[str(target)]]) for target in targets]
-
-        sentences = pad_sequence(sentences, batch_first=True)
-        targets = pad_sequence(targets, batch_first=True)
+    def train(self, sentences1, sentences2, labels, batch_size, epochs):
+        sentences1 = [torch.LongTensor([self.word_to_index[str(word)] for word in sentence]) for sentence in sentences1]
+        sentences2 = [torch.LongTensor([self.word_to_index[str(word)] for word in sentence]) for sentence in sentences2]
 
         print(f"Start to Train\tEpoch_Size:\t{epochs}\tBatch_Size:\t{batch_size}")
 
@@ -45,36 +52,69 @@ class SentenceSimilarityModel(nn.Module):
             total_loss = .0
             start_time = time.time()
 
-            for i in range(0, len(sentences), batch_size):
-                batch_end = min(i + batch_size, len(sentences))
+            for i in range(0, len(sentences1), batch_size):
+                batch_end = min(i + batch_size, len(sentences1))
+                sentence1_batch = pad_sequence(sentences1[i:batch_end], batch_first=True)
+                sentence2_batch = pad_sequence(sentences2[i:batch_end], batch_first=True)
 
-                sentence_batch = sentences[i:batch_end]
-                target_batch = targets[i:batch_end].view(-1)
-
-                out = self.forward(sentence_batch)
-                target = target_batch
-
-                loss = self.loss_fn(out, target)
-                total_loss += loss
-                loss.backward()
-
+                label_batch = torch.tensor(labels[i:batch_end])
+                
+                out = self.forward(sentence1_batch, sentence2_batch)
+                loss = self.loss_fn(out, label_batch)
+                total_loss += loss.item()
+                
                 self.optimizer.zero_grad()
+                loss.backward()
                 self.optimizer.step()
 
             end_time = time.time()
 
             print(f"epoch\t{epoch+1}\tloss:\t{total_loss:.5f}\ttime:\t{end_time-start_time:.5f} sec")
 
-class WordSimilarityModel(nn.Module):
-    def __init__(self, sentence_model):
-        super(WordSimilarityModel, self).__init__()
-        self.sentence_model = sentence_model
-        self.get_index = sentence_model.word_to_index
-        self.get_word = sentence_model.index_to_word
-        self.cos = nn.CosineSimilarity(dim=1, eps=1e-6)
+## Word--
+class KMeans(nn.Module):
+    def __init__(self, embedding_weights, num_clusters):
+        super(KMeans, self).__init__()
+        self.embedding_weights = embedding_weights
+        self.num_clusters = num_clusters
+        self.cluster_centers = torch.randn(num_clusters, embedding_weights.size(-1))    
+        self.register_buffer('counts', torch.zeros(num_clusters))
+    
+    def forward(self, x):
+        distances = torch.cdist(x, self.cluster_centers)
+        _, cluster_assignments = distances.min(dim=-1)
+        self.counts.data.zero_()
+        self.counts.scatter_add_(0, cluster_assignments.view(-1), torch.ones(x.size(0)))
+        for cluster in range(self.num_clusters):
+            members = x[cluster_assignments == cluster]
+            if members.numel() == 0:
+                continue
+            self.cluster_centers[cluster] = members.mean(dim=0)
+        return self.cluster_centers, self.counts
 
-    def predict(self, word, top_n=5):
-        word_embedding = self.sentence_model.embedding(torch.tensor([self.get_index[word]]))
-        similarity = self.cos(word_embedding, self.sentence_model.embedding.weight)
-        _, top_n_indices = torch.topk(similarity, top_n)
-        return [self.get_word[i.item()] for i in top_n_indices] ## i -> tensor
+class KMeansWordSimilarity():
+    def __init__(self, model, num_clusters):
+        self.embedding_layer = model.embedding
+        self.embedding_layer.weight.requiresGrad = False
+        self.embedding_weights = self.embedding_layer.weight.data
+        self.kmeans = KMeans(embedding_weights=self.embedding_weights, num_clusters=num_clusters)
+        
+        self.vocab = model.vocab
+        self.word_to_index = model.word_to_index
+        self.index_to_word = model.index_to_word
+        
+    def cluster(self):
+        self.clusters, self.counts = self.kmeans(self.embedding_weights)
+        _, self.word_to_cluster = torch.min(torch.cdist(self.embedding_weights, self.clusters), dim=1)
+        self.word_to_cluster = {word: int(cluster) for word, cluster in zip(self.vocab, self.word_to_cluster)}
+
+    def find(self, word, top_k = 5):
+        word_embedding = self.embedding_layer(torch.LongTensor([self.word_to_index[word]]))
+
+        cluster = self.word_to_cluster[word]
+        cluster_words = [word for word, c in self.word_to_cluster.items() if c == cluster]
+
+        distances = torch.cdist(word_embedding, self.embedding_layer(torch.tensor([self.word_to_index[w] for w in cluster_words])))
+
+        _, closest_words_indices = distances.topk(top_k)
+        return [cluster_words[i] for i in closest_words_indices[0]]
