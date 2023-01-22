@@ -39,7 +39,7 @@ class SentenceSimilarityModel(nn.Module):
                 lstm_out2 = torch.nn.functional.pad(lstm_out2, (0,0,0, lstm_out1.shape[0]-lstm_out2.shape[0]))
         
         concatenated = torch.cat((lstm_out1, lstm_out2), dim=1)
-        out = self.linear(concatenated)
+        out = torch.sigmoid(self.linear(concatenated))
         return out
 
     def train(self, sentences1, sentences2, labels, batch_size, epochs):
