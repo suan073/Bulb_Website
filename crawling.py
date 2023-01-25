@@ -188,7 +188,7 @@ class analyze ():
         self.max_views = self.idx[0][0]
         self.get_upload_date()
         self.fill_views_in_dic()
-        for i in range(5):
+        for i in range(min(5, len(self.idx))):
             self.max_n_datas.append(json.dumps({'views' : self.idx[i][0], 'title' : self.content_total_title[self.idx[i][1]], 'link' : self.content_total_link[self.idx[i][1]]}))
         
 
@@ -234,6 +234,12 @@ class analyze ():
             'data' : json.dumps(self.date_dict)
         }
         return json.dumps(data)
+
+
+a = analyze()
+a.crawling('리뷰 이벤트')
+a.extract_data()
+print(a.get_data())
 
 
 # crawling.py 이용법 
