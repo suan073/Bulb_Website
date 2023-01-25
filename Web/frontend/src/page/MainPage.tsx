@@ -1,5 +1,5 @@
-import "Page.css";
+import MainPageContainer from "../components/Main/MainPageContainer";
 
 export default function MainPage() {
-  return <div className="MainPageContainer"></div>;
+  return <MainPageContainer />;
 }
