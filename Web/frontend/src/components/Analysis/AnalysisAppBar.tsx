@@ -6,6 +6,7 @@ import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
 
 import SearchIcon from "@mui/icons-material/Search";
+import CloseIcon from "@mui/icons-material/Close";
 
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
@@ -17,7 +18,11 @@ const appBarTheme = createTheme({
   },
 });
 
-export default function SearchAppBar() {
+type props = {
+  title: string;
+};
+
+export default function AnalysisAppBar(props: props) {
   return (
     <ThemeProvider theme={appBarTheme}>
       <AppBar
@@ -25,6 +30,13 @@ export default function SearchAppBar() {
         sx={{ height: "10vh", justifyContent: "center", m: 0 }}
       >
         <Toolbar sx={{ justifyContent: "space-between" }}>
+          <IconButton
+            type="button"
+            size="large"
+            sx={{ p: 0, m: 0, color: "white" }}
+          >
+            <CloseIcon fontSize="large" />
+          </IconButton>
           <Typography
             variant="h1"
             sx={{
@@ -33,10 +45,10 @@ export default function SearchAppBar() {
               color: "white",
               textAlign: "center",
               fontWeight: "bold",
-              fontSize: "4vw",
+              fontSize: "3vw",
             }}
           >
-            Bulb
+            {props.title}
           </Typography>
           <Paper
             sx={{
