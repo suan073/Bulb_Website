@@ -20,7 +20,7 @@ module.exports = {
   },
 
   resolve: {
-    extensions: [".js", ".jsx", ".ts", ".tsx"],
+    extensions: [".js", ".jsx", ".ts", ".tsx", ".scss"],
   },
 
   module: {
@@ -31,8 +31,8 @@ module.exports = {
         exclude: /node_modules/,
       },
       {
-        test: /\.css$/i,
-        use: ["style-loader", "css-loader"],
+        test: /\.scss$/,
+        use: ["style-loader", "css-loader", "sass-loader"],
       },
     ],
   },
@@ -40,6 +40,7 @@ module.exports = {
   output: {
     path: path.join(__dirname, "/dist"),
     filename: "bundle.js",
+    publicPath: "/",
   },
 
   plugins: [
