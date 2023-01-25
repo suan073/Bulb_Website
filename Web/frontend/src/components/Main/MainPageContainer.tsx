@@ -38,34 +38,37 @@ export default function MainPageContainer() {
             </Typography>
           </Grid>
           <Grid item>
-            <Grid container direction="column" alignItems="center">
-              <Grid item>
-                <Paper
-                  component="form"
-                  sx={{
-                    m: 0,
-                    p: 0,
-                    borderRadius: 4,
-                    width: "40vw",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    boxShadow: 0,
-                  }}
-                >
-                  <InputBase
-                    placeholder="Search"
-                    sx={{ p: 0, m: 0, ml: "1vw" }}
-                  />
-                  <IconButton
-                    type="button"
-                    sx={{ p: 0, m: 0, mr: "1vw", color: "black" }}
-                  >
-                    <SearchIcon />
-                  </IconButton>
-                </Paper>
-              </Grid>
-            </Grid>
+            <Paper
+              component="form"
+              sx={{
+                m: 0,
+                p: 0,
+                borderRadius: 6,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                boxShadow: 0,
+              }}
+            >
+              <InputBase
+                placeholder="Search"
+                sx={{
+                  p: 0,
+                  m: 0,
+                  ml: "2vw",
+                  width: "20vw",
+                  height: "6vh",
+                  fontSize: "2vw",
+                  fontWeight: "bold",
+                }}
+              />
+              <IconButton
+                type="button"
+                sx={{ p: 0, m: 0, mr: "1vw", color: "black" }}
+              >
+                <SearchIcon fontSize="large" />
+              </IconButton>
+            </Paper>
           </Grid>
         </Grid>
       </div>

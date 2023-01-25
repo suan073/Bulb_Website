@@ -40,7 +40,7 @@ export default function LineGraph({ isBig, x_Data, y_Data }: props) {
     },
     scales: {
       x: {
-        display: isBig,
+        display: false,
       },
     },
   };
@@ -57,9 +57,7 @@ export default function LineGraph({ isBig, x_Data, y_Data }: props) {
   };
 
   return isBig ? (
-    <div style={{ width: "24vx", height: "20vh" }}>
-      <Line options={options} data={data} />
-    </div>
+    <Line options={options} data={data} />
   ) : (
     <div style={{ width: "24vx", height: "20vh" }}>
       <Line options={options} data={data} />

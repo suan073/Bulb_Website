@@ -15,36 +15,6 @@ import LineGraph from "../Graph/LineGraph";
 
 import "./Search.scss";
 
-const dummyDataSet = {
-  title: "Dummy",
-  isBig: false,
-  x_Data: [
-    "2022-12-01",
-    "2022-12-05",
-    "2022-12-10",
-    "2022-12-15",
-    "2022-12-20",
-    "2022-12-25",
-    "2022-12-31",
-  ],
-  y_Data: [20, 100, 180, 160, 130, 120, 110],
-};
-
-const dummyDataSets = [
-  dummyDataSet,
-  dummyDataSet,
-  dummyDataSet,
-  dummyDataSet,
-  dummyDataSet,
-  dummyDataSet,
-  dummyDataSet,
-  dummyDataSet,
-  dummyDataSet,
-  dummyDataSet,
-  dummyDataSet,
-  dummyDataSet,
-];
-
 type dataSets = {
   title: string;
   isBig: boolean;
@@ -52,8 +22,9 @@ type dataSets = {
   y_Data: number[];
 };
 
-export default function SearchedCardContainer() {
-  const [dataSets] = React.useState(dummyDataSets);
+type props = { data: dataSets[] };
+
+export default function SearchedCardContainer(props: props) {
   const [page, setPage] = React.useState(1);
 
   const pageChangeHandler = (
@@ -64,29 +35,29 @@ export default function SearchedCardContainer() {
     setPage(value);
   };
 
-  const renderGraphCard = (dataSets: dataSets[]) => {
-    return dataSets
+  const renderGraphCard = () => {
+    return props.data
       .slice(
         (page - 1) * 12,
-        page * 12 < dataSets.length ? page * 12 : dataSets.length
+        page * 12 < props.data.length ? page * 12 : props.data.length
       )
       .map((dataSet, index) => (
         <Grid item key={index}>
           <Paper
             sx={{
               borderRadius: 2,
-              boxShadow: 1,
-              width: "24vw",
+              boxShadow: 3,
+              width: "22vw",
               height: "24vh",
-              mx: "0.6vh",
+              mx: "2vh",
               my: "1vh",
             }}
           >
             <Paper
               sx={{
                 borderRadius: 0,
-                boxShadow: 1,
-                width: "24vw",
+                boxShadow: 3,
+                width: "22vw",
                 height: "4vh",
                 display: "flex",
                 alignItems: "center",
@@ -112,11 +83,7 @@ export default function SearchedCardContainer() {
                 <SearchIcon />
               </IconButton>
             </Paper>
-            <LineGraph
-              isBig={dataSet.isBig}
-              x_Data={dataSet.x_Data}
-              y_Data={dataSet.y_Data}
-            />
+            <LineGraph {...dataSet} />
           </Paper>
         </Grid>
       ));
@@ -141,7 +108,7 @@ export default function SearchedCardContainer() {
           spacing={0}
           sx={{ p: 0, mt: "3vh" }}
         >
-          {renderGraphCard(dataSets)}
+          {renderGraphCard()}
         </Grid>
         <Grid item sx={{ p: 0, m: 0, mb: "3vh" }}>
           <Paper
@@ -155,8 +122,8 @@ export default function SearchedCardContainer() {
           >
             <Pagination
               count={
-                Math.floor(dataSets.length / 12) +
-                (dataSets.length % 12 == 0 ? 0 : 1)
+                Math.floor(props.data.length / 12) +
+                (props.data.length % 12 == 0 ? 0 : 1)
               }
               defaultPage={1}
               boundaryCount={2}
