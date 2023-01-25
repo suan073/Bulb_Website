@@ -24,7 +24,6 @@ export default function MainPageContainer() {
           <Grid item>
             <Typography
               className="TitleBulb"
-              data-heading="l"
               variant="h1"
               sx={{
                 m: 0,
@@ -40,21 +39,6 @@ export default function MainPageContainer() {
           </Grid>
           <Grid item>
             <Grid container direction="column" alignItems="center">
-              <Grid item sx={{ mb: "4vh" }}>
-                <Typography
-                  variant="h1"
-                  sx={{
-                    m: 0,
-                    p: 0,
-                    color: "white",
-                    textAlign: "center",
-                    fontWeight: "bold",
-                    fontSize: "3vw",
-                  }}
-                >
-                  유튜브의 최근 동향을 알아보세요!
-                </Typography>
-              </Grid>
               <Grid item>
                 <Paper
                   component="form"
