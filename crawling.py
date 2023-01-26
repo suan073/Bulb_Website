@@ -206,9 +206,8 @@ class analyze ():
                 html = self.driver.page_source
                 soup = BeautifulSoup(html, 'html.parser')
                 tags = soup.findAll('div', attrs={'class': 'factoid style-scope ytd-factoid-renderer'})
-                start = str(tags[2]).find('aria-label="') + 12
-                end = str(tags[2]).find('"', start)
-                self.content_upload_date.append(str(tags[2])[start : end])
+                upload_date = tags[2].attrs['aria-label']
+                self.content_upload_date.append(upload_date)
                 continue
 
             html = self.driver.page_source
@@ -220,9 +219,9 @@ class analyze ():
         for element in self.idx:
             index = element[1]
             try:
-                self.date_dict[str(datetime.strptime(self.content_upload_date[index][:-1].replace('.','-').replace(' ',''), "%Y-%m-%d").strftime("%Y-%m-%d"))] += 1
+                self.date_dict[datetime.strptime(self.content_upload_date[index][:-1].replace('.','-').replace(' ',''), "%Y-%m-%d").strftime("%Y-%m-%d")] += 1
             except:
-                self.date_dict[str(datetime.strptime(self.content_upload_date[index][14:-1].replace('.','-').replace(' ',''), "%Y-%m-%d").strftime("%Y-%m-%d"))] += 1
+                self.date_dict[datetime.strptime(self.content_upload_date[index][14:-1].replace('.','-').replace(' ',''), "%Y-%m-%d").strftime("%Y-%m-%d")] += 1
         print(self.date_dict)
 
     def get_data(self):
@@ -235,11 +234,13 @@ class analyze ():
         }
         return json.dumps(data)
 
+if __name__ == "__main__":
 
-a = analyze()
-a.crawling('리뷰 이벤트')
-a.extract_data()
-print(a.get_data())
+    a = analyze()
+    str = str(input())
+    a.crawling(str)
+    a.extract_data()
+    print(a.get_data())
 
 
 # crawling.py 이용법 
