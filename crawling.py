@@ -178,18 +178,25 @@ class analyze ():
 
 
         self.cumulative_sec = sum(self.content_duration_sec)
-        self.average_views = self.cumulative_views / len(self.idx)
-        self.average_sec = self.cumulative_sec / self.video_cnt
+        if(len(self.idx) != 0):
+            self.average_views = self.cumulative_views / len(self.idx)
+        else:
+            self.average_views
+        if(self.video_cnt != 0):
+            self.average_sec = self.cumulative_sec / self.video_cnt
+        else :
+            self.average_sec = 0
 
         self.idx.sort(key=lambda x: x[0], reverse = True)
         print(self.idx)
         now = datetime.now()
         self.lastupdate_time = now.strftime('%Y-%m-%d %H:%M:%S')
-        self.max_views = self.idx[0][0]
+        if(len(self.idx) != 0):
+            self.max_views = self.idx[0][0]
         self.get_upload_date()
         self.fill_views_in_dic()
         for i in range(min(5, len(self.idx))):
-            self.max_n_datas.append(json.dumps({'views' : self.idx[i][0], 'title' : self.content_total_title[self.idx[i][1]], 'link' : self.content_total_link[self.idx[i][1]]}))
+            self.max_n_datas.append(json.dumps({'view' : self.idx[i][0], 'video_name' : self.content_total_title[self.idx[i][1]], 'youtube_link' : self.content_total_link[self.idx[i][1]]}))
         
 
     def get_upload_date(self):
