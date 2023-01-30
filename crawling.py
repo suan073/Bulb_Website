@@ -10,6 +10,8 @@ import time
 import random
 import json
 import pandas as pd
+import ast
+import json
 from datetime import datetime, timedelta
 
 from selenium.webdriver.chrome.service import Service
@@ -43,7 +45,6 @@ class analyze ():
         self.average_sec = 0
         self.exceptcnt = 0
         self.average_views = 0
-        today = datetime.today()
         today = datetime.today()
 
         self.date_dict = {}
@@ -208,14 +209,17 @@ class analyze ():
             try:
                 self.driver.find_element_by_xpath("//*[@id='expand']").click()
             except:
-                self.driver.find_element_by_xpath("//*[@id='button-shape']/button/yt-touch-feedback-shape/div/div[2]").click()
-                self.driver.find_element_by_xpath("//*[@id='items']/ytd-menu-service-item-renderer/tp-yt-paper-item/yt-formatted-string").click()
-                html = self.driver.page_source
-                soup = BeautifulSoup(html, 'html.parser')
-                tags = soup.findAll('div', attrs={'class': 'factoid style-scope ytd-factoid-renderer'})
-                upload_date = tags[2].attrs['aria-label']
-                self.content_upload_date.append(upload_date)
-                continue
+                try:
+                    self.driver.find_element_by_xpath("//*[@id='button-shape']/button/yt-touch-feedback-shape/div/div[2]").click()
+                    self.driver.find_element_by_xpath("//*[@id='items']/ytd-menu-service-item-renderer/tp-yt-paper-item/yt-formatted-string").click()
+                    html = self.driver.page_source
+                    soup = BeautifulSoup(html, 'html.parser')
+                    tags = soup.findAll('div', attrs={'class': 'factoid style-scope ytd-factoid-renderer'})
+                    upload_date = tags[2].attrs['aria-label']
+                    self.content_upload_date.append(upload_date)
+                    continue
+                except:
+                    continue
 
             html = self.driver.page_source
             soup = BeautifulSoup(html, 'html.parser')
@@ -232,11 +236,11 @@ class analyze ():
         print(self.date_dict)
 
     def get_data(self):
-        data = {'average_views' : int(self.average_views),
-            'max_views' : self.max_views,
-            'last_update time' : datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            'links' : self.max_n_datas,
-            'average video length' : self.average_sec,
+        data = {'average_view' : int(self.average_views),
+            'max_view' : self.max_views,
+            'lastest_updatetime' : datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            'top5links' : ','.join(self.max_n_datas),
+            'average_video_length' : self.average_sec,
             'data' : json.dumps(self.date_dict)
         }
         return json.dumps(data)
