@@ -6,6 +6,7 @@
 
 # bulbapi
 ``` uvicorn main:app --reload ```를 실행하고 ``` http://127.0.0.1:8000/docs ```에 들어가면 현재까지 만들어진 api를 확인할 수 있음
+더미데이터를 넣은 db 도 올려 놓았기 때문에 바로 api 사용이 가능함.
 자세한 사항은 노션의 api 페이지를 확인하길 바람.
 
 # crawling.py 
