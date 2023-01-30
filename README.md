@@ -4,9 +4,9 @@
 # Input_Layer
 태민이가 채워주세요
 
-# SGNS
-Skip-Gram 모델과 Skip-Gram모델에서 사용되는 모듈들이 있는 directory입니다. 모델은 pytorch를 사용하여 구현되어 있고, Negative-Sampling을 사용하여 기존의 Skip-Gram 모델보다 좋은 성능을 보입니다. Skip-gram 모델은 기존에 존재하는 .txt 파일을 사용하여 pre-training 한 후, 사용자의 input 값이 들어오면, output값으로 input값과 관련된 수식어구들이 나옵니다.  
-
+# bulbapi
+``` uvicorn main:app --reload ```를 실행하고 ``` http://127.0.0.1:8000/docs ```에 들어가면 현재까지 만들어진 api를 확인할 수 있음
+자세한 사항은 노션의 api 페이지를 확인하길 바람.
 
 # crawling.py 
 
