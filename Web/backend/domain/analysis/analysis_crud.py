@@ -1,9 +1,11 @@
-from models import Analysis
+from models import Analysis,Topic
 from sqlalchemy.orm import Session
 
 
 def get_Analysis(db: Session, topic_id: int):
-    analysis_list = db.query(Analysis)\
+    analysis = db.query(Analysis)\
         .filter(topic_id == topic_id)\
-        .all()
-    return analysis_list[0]
+        .one()
+    analysis.topic_name = db.query(Topic).filter(Topic.topic_id==topic_id).one().topic_name
+    analysis.isBig = True
+    return analysis
