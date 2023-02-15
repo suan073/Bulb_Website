@@ -46,8 +46,10 @@ class analyze ():
         self.exceptcnt = 0
         self.average_views = 0
         today = datetime.today()
-
+        
         self.date_dict = {}
+        self.x_data = []
+        self.y_data = []
 
         month_ago = today - timedelta(days=60)
 
@@ -200,7 +202,8 @@ class analyze ():
         
 
     def get_upload_date(self):
-        for link in self.content_total_link:
+        for i in self.idx:
+            link = self.content_total_link[i[1]]
             self.driver.get(link)
             time.sleep(1)
 
@@ -218,7 +221,7 @@ class analyze ():
                     self.content_upload_date.append(upload_date)
                     continue
                 except:
-                    continue
+                    pass
 
             html = self.driver.page_source
             soup = BeautifulSoup(html, 'html.parser')
@@ -226,13 +229,20 @@ class analyze ():
             self.content_upload_date.append(tags[2].get_text())
     
     def fill_views_in_dic(self):
-        for element in self.idx:
-            index = element[1]
+        for element in self.content_upload_date:
+            
             try:
-                self.date_dict[datetime.strptime(self.content_upload_date[index][:-1].replace('.','-').replace(' ',''), "%Y-%m-%d").strftime("%Y-%m-%d")] += 1
+                self.date_dict[datetime.strptime(element[:-1].replace('.','-').replace(' ',''), "%Y-%m-%d").strftime("%Y-%m-%d")] += 1
             except:
-                self.date_dict[datetime.strptime(self.content_upload_date[index][14:-1].replace('.','-').replace(' ',''), "%Y-%m-%d").strftime("%Y-%m-%d")] += 1
-        print(self.date_dict)
+                try:
+                    self.date_dict[datetime.strptime(element[14:-1].replace('.','-').replace(' ',''), "%Y-%m-%d").strftime("%Y-%m-%d")] += 1
+                except:
+                    pass
+        
+        for key, value in self.date_dict.items():
+            self.x_data.append(key)
+            self.y_data.append(value)
+
 
     def get_data(self):
         data = {'average_view' : int(self.average_views),
@@ -240,15 +250,16 @@ class analyze ():
             'lastest_updatetime' : datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             'top5links' : ','.join(self.max_n_datas),
             'average_video_length' : self.average_sec,
-            'data' : json.dumps(self.date_dict)
+            'x_data' : str(self.x_data),
+            'y_data' : str(self.y_data)
         }
         return json.dumps(data)
 
 if __name__ == "__main__":
 
     a = analyze()
-    str = str(input())
-    a.crawling(str)
+    string = str(input())
+    a.crawling(string)
     a.extract_data()
     print(a.get_data())
 
