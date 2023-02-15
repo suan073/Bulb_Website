@@ -1,8 +1,8 @@
 from fastapi import FastAPI
+from starlette.middleware.cors import CORSMiddleware
 
 from domain.analysis import analysis_router
 from domain.topic import topic_router
-from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
