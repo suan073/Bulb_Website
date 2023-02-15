@@ -16,5 +16,5 @@ def question_detail(topic_id: int, db: Session = Depends(get_db)):
 @router.get("/Brief/{topic_id}", response_model=analysis_schema.brief_Analysis)
 def question_brief(topic_id: int, db: Session = Depends(get_db)):
     analysis = analysis_crud.get_Analysis(db, topic_id=topic_id)
-    brief_ana = { "analysis_id" : analysis.analysis_id, "topic_id": analysis.topic_id, "topic_name": analysis.topic_name , "data": analysis.data, "isBig":False }
+    brief_ana = { "analysis_id" : analysis.analysis_id, "topic_id": analysis.topic_id, "topic_name": analysis.topic_name , "x_data": analysis.x_data,  "y_data": analysis.y_data, "isBig":False }
     return brief_ana

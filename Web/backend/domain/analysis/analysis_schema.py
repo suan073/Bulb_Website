@@ -12,7 +12,8 @@ class Analysis(BaseModel):
     lastest_updatetime: datetime
     top5links: str
     avg_video_length: float
-    data: str
+    x_data: str
+    y_data: str
     isBig: bool
 
     class Config:
@@ -22,5 +23,6 @@ class brief_Analysis(BaseModel):
     analysis_id: int
     topic_id: int
     topic_name: str
-    data: str
+    x_data: str
+    y_data: str
     isBig: bool

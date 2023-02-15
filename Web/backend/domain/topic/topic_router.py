@@ -10,9 +10,9 @@ router = APIRouter(
 
 @router.get("/list/{word}", response_model = List[int])
 def word2id(word: str, db: Session = Depends(get_db)):
-    keyword = db.query(Keyword).filter(Keyword.keyword_name == word).all()
+    keyword = db.query(Keyword).filter(Keyword.keyword_name == word).one()
     associate_topic = []
-    topic = db.query(Topic).filter(Topic.keyword_id == keyword[0].keyword_id).all()
+    topic = db.query(Topic).filter(Topic.keyword_id == keyword.keyword_id).all()
     for item in topic:
         associate_topic.append(item.topic_id)
     return associate_topic

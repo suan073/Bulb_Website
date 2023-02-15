@@ -1,3 +1,9 @@
+# crawling.py 이용법 
+# 1. analyze 객채 생성     ex) instance = analyze()
+# 2. instance.crawling() 메서드 실행
+# 3. instance.extract_data() 메서드 실행
+# 4. ret = instance.get_data() 메서드 실행 해서 json 파일 받기
+
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -264,8 +270,3 @@ if __name__ == "__main__":
     print(a.get_data())
 
 
-# crawling.py 이용법 
-# 1. analyze 객채 생성     ex) instance = analyze()
-# 2. instance.crawling() 메서드 실행
-# 3. instance.extract_data() 메서드 실행
-# 4. ret = instance.get_data() 메서드 실행 해서 json 파일 받기
