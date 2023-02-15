@@ -30,4 +30,5 @@ class Analysis(Base):
     lastest_updatetime = Column(DateTime, nullable = False)
     top5links = Column(String, nullable = False)
     avg_video_length = Column(Integer, nullable = False)
-    data = Column(String, nullable = False)
+    x_data = Column(String, nullable = False)
+    y_data = Column(String, nullable = False)
