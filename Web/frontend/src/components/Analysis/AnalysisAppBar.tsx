@@ -1,3 +1,6 @@
+import React from "react";
+import { useNavigate } from "react-router-dom";
+
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Paper from "@mui/material/Paper";
@@ -23,6 +26,9 @@ type props = {
 };
 
 export default function AnalysisAppBar(props: props) {
+  const [keyWord, setKeyWord] = React.useState("");
+  const navigate = useNavigate();
+
   return (
     <ThemeProvider theme={appBarTheme}>
       <AppBar
@@ -48,9 +54,10 @@ export default function AnalysisAppBar(props: props) {
               fontSize: "3vw",
             }}
           >
-            {props.title}
+            키워드 - {props.title}
           </Typography>
           <Paper
+            component="form"
             sx={{
               borderRadius: 4,
               boxShadow: 0,
@@ -58,13 +65,20 @@ export default function AnalysisAppBar(props: props) {
               alignItems: "center",
               justifyContent: "space-between",
             }}
+            onSubmit={(event) => {
+              event.preventDefault();
+              navigate(`../../search/${keyWord}`);
+            }}
           >
             <InputBase
               placeholder="Search"
               sx={{ p: 0, m: 0, ml: "1vw", width: "10vw" }}
+              onChange={(event) => {
+                setKeyWord(event.target.value);
+              }}
             />
             <IconButton
-              type="button"
+              type="submit"
               sx={{ p: 0, m: 0, mr: "1vw", color: "black" }}
             >
               <SearchIcon />

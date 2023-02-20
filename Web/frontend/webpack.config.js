@@ -1,13 +1,14 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const RefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
+const Dotenv = require("dotenv-webpack");
 
 module.exports = {
   mode: process.env.NODE_ENV || "development",
   devtool: "eval",
   devServer: {
     historyApiFallback: true,
-    port: 3200,
+    port: process.env.DEV_PORT,
     open: true,
     hot: true,
     devMiddleware: {
@@ -48,5 +49,6 @@ module.exports = {
       template: "./public/index.html",
     }),
     new RefreshWebpackPlugin(),
+    new Dotenv(),
   ],
 };

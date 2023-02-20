@@ -1,4 +1,6 @@
 import React from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
@@ -15,17 +17,13 @@ import LineGraph from "../Graph/LineGraph";
 
 import "./Search.scss";
 
-type dataSets = {
-  title: string;
-  isBig: boolean;
-  x_Data: string[];
-  y_Data: number[];
-};
-
-type props = { data: dataSets[] };
+type props = { data: Array<any> };
 
 export default function SearchedCardContainer(props: props) {
   const [page, setPage] = React.useState(1);
+  const [graphData, setGraphData] = React.useState<Array<any>>([]);
+  const apiKey = process.env.API_KEY as string;
+  const navigate = useNavigate();
 
   const pageChangeHandler = (
     event: React.ChangeEvent<unknown>,
@@ -35,8 +33,24 @@ export default function SearchedCardContainer(props: props) {
     setPage(value);
   };
 
+  React.useEffect(() => {
+    async function fetchData(ids: Array<number>) {
+      try {
+        const promises = ids.map(async (id) => {
+          const res = await axios.get(apiKey + `api/analysis/Brief/${id}`);
+          return res.data;
+        });
+        const data = await Promise.all(promises);
+        setGraphData(data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    fetchData(props.data);
+  }, [props.data]);
+
   const renderGraphCard = () => {
-    return props.data
+    return graphData
       .slice(
         (page - 1) * 12,
         page * 12 < props.data.length ? page * 12 : props.data.length
@@ -54,6 +68,7 @@ export default function SearchedCardContainer(props: props) {
             }}
           >
             <Paper
+              component="form"
               sx={{
                 borderRadius: 0,
                 boxShadow: 3,
@@ -62,6 +77,10 @@ export default function SearchedCardContainer(props: props) {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
+              }}
+              onSubmit={(event) => {
+                event.preventDefault();
+                navigate(`../../analysis/${dataSet.topic_id}`);
               }}
             >
               <Typography
@@ -74,16 +93,20 @@ export default function SearchedCardContainer(props: props) {
                   fontSize: "1.5vw",
                 }}
               >
-                {dataSet.title}
+                {dataSet.topic_name}
               </Typography>
               <IconButton
-                type="button"
+                type="submit"
                 sx={{ p: 0, m: 0, mr: "0.5vw", color: "black" }}
               >
                 <SearchIcon />
               </IconButton>
             </Paper>
-            <LineGraph {...dataSet} />
+            <LineGraph
+              isBig={dataSet.isBig}
+              x_Data={JSON.parse(dataSet.x_data.replace(/'/g, '"'))}
+              y_Data={JSON.parse(dataSet.y_data)}
+            />
           </Paper>
         </Grid>
       ));
