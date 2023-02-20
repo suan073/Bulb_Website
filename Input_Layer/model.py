@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import torch.optim as optim
 from torch.nn.utils.rnn import pad_sequence
 
@@ -9,11 +10,11 @@ class SentenceSimilarityModel(nn.Module):
     def __init__(self, vocab, embedding_dim, hidden_dim):
         super(SentenceSimilarityModel, self).__init__()
         self.embedding = nn.Embedding(len(vocab), embedding_dim)
-        self.lstm = nn.LSTM(embedding_dim, hidden_dim, batch_first=True)
-        self.linear = nn.Linear(2*hidden_dim, 1)
+        # self.lstm = nn.LSTM(embedding_dim, hidden_dim, batch_first=True)
+        self.linear = nn.Linear(embedding_dim, 1)
         
         self.optimizer = optim.Adam(self.parameters())
-        self.loss_fn = nn.BCEWithLogitsLoss()
+        self.loss_fn = nn.BCELoss()
 
         self.vocab = vocab
         self.vocab_size = len(vocab)
@@ -51,6 +52,7 @@ class SentenceSimilarityModel(nn.Module):
         for epoch in range(epochs):
             total_loss = .0
             start_time = time.time()
+            count = 0
 
             for i in range(0, len(sentences1), batch_size):
                 batch_end = min(i + batch_size, len(sentences1))
@@ -67,9 +69,11 @@ class SentenceSimilarityModel(nn.Module):
                 loss.backward()
                 self.optimizer.step()
 
+                count += 1
+
             end_time = time.time()
 
-            print(f"epoch\t{epoch+1}\tloss:\t{total_loss:.5f}\ttime:\t{end_time-start_time:.5f} sec")
+            print(f"epoch\t{epoch+1}\tloss:\t{total_loss / count:.5f}\ttime:\t{end_time-start_time:.5f} sec")
 
 ## Word--
 class KMeans(nn.Module):

@@ -1,3 +1,6 @@
+import React from "react";
+import { useNavigate } from "react-router-dom";
+
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
@@ -9,6 +12,9 @@ import SearchIcon from "@mui/icons-material/Search";
 import "./Main.scss";
 
 export default function MainPageContainer() {
+  const [keyWord, setKeyWord] = React.useState("");
+  const navigate = useNavigate();
+
   return (
     <div className="MainPageContainer">
       <div className="TitleContainer">
@@ -49,9 +55,16 @@ export default function MainPageContainer() {
                 justifyContent: "space-between",
                 boxShadow: 0,
               }}
+              onSubmit={(event) => {
+                event.preventDefault();
+                navigate(`search/${keyWord}`);
+              }}
             >
               <InputBase
                 placeholder="Search"
+                onChange={(event) => {
+                  setKeyWord(event.target.value);
+                }}
                 sx={{
                   p: 0,
                   m: 0,
@@ -63,7 +76,7 @@ export default function MainPageContainer() {
                 }}
               />
               <IconButton
-                type="button"
+                type="submit"
                 sx={{ p: 0, m: 0, mr: "1vw", color: "black" }}
               >
                 <SearchIcon fontSize="large" />

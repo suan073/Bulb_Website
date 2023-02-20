@@ -1,3 +1,6 @@
+import React from "react";
+import { useNavigate } from "react-router-dom";
+
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Paper from "@mui/material/Paper";
@@ -18,6 +21,9 @@ const appBarTheme = createTheme({
 });
 
 export default function SearchAppBar() {
+  const [keyWord, setKeyWord] = React.useState("");
+  const navigate = useNavigate();
+
   return (
     <ThemeProvider theme={appBarTheme}>
       <AppBar
@@ -39,6 +45,7 @@ export default function SearchAppBar() {
             Bulb
           </Typography>
           <Paper
+            component="form"
             sx={{
               borderRadius: 4,
               boxShadow: 0,
@@ -46,10 +53,19 @@ export default function SearchAppBar() {
               alignItems: "center",
               justifyContent: "space-between",
             }}
+            onSubmit={(event) => {
+              event.preventDefault();
+              navigate(`../../search/${keyWord}`);
+              setKeyWord("");
+            }}
           >
             <InputBase
               placeholder="Search"
               sx={{ p: 0, m: 0, ml: "1vw", width: "10vw" }}
+              onChange={(event) => {
+                setKeyWord(event.target.value);
+              }}
+              value={keyWord}
             />
             <IconButton
               type="button"
